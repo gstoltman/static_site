@@ -24,17 +24,26 @@ class HTMLNode:
         return html
 
 class LeafNode(HTMLNode):
-    def __init__(self, tag=None, value=None, children=None, props=None):
+    def __init__(self, tag=None, value=None, props=None):
         super().__init__(tag=tag, value=value, children=[], props=props)
 
     # anything to do here with inheriting from parent class?
     def to_html(self):
+        props_str = ' '.join(f'{key}="{value}"' for key, value in self.props.items())
         if not self.value:
             raise ValueError('all leaf nodes must have a value')
         elif not self.tag:
-            return value
+            return self.value
         else:
-            # RENDER HTML TAG
+            if props_str:
+                return f'<{self.tag} {props_str}>{self.value}</{self.tag}>'
+            else:
+                return f'<{self.tag}>{self.value}</{self.tag}>'
+
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children, props=None):
+        super().__init__(tag=tag, value=value, children=children, props=props)--------------------------------------
+Ran 5 tests in 0.000s
         
 
 
