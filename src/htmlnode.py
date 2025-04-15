@@ -16,34 +16,41 @@ class HTMLNode:
     def to_html(self):
         raise NotImplementedError("Not implemented")
     
-    # might need to strip quotes from f-string key
     def props_to_html(self):
+        if self.props is None:
+            return ''
         html = ''
         for key, value in self.props.items():
             html += f' {key}="{value}"'
         return html
 
 class LeafNode(HTMLNode):
-    def __init__(self, tag=None, value=None, props=None):
-        super().__init__(tag=tag, value=value, children=[], props=props)
+    def __init__(self, tag, value, props=None):
+        super().__init__(tag, value, None, props)
 
-    # anything to do here with inheriting from parent class?
     def to_html(self):
-        props_str = ' '.join(f'{key}="{value}"' for key, value in self.props.items())
         if not self.value:
             raise ValueError('all leaf nodes must have a value')
-        elif not self.tag:
+        if not self.tag:
             return self.value
-        else:
-            if props_str:
-                return f'<{self.tag} {props_str}>{self.value}</{self.tag}>'
-            else:
-                return f'<{self.tag}>{self.value}</{self.tag}>'
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
 class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
-        super().__init__(tag=tag, value=value, children=children, props=props)--------------------------------------
-Ran 5 tests in 0.000s
+        super().__init__(tag, None, children, props)
+
+    def to_html(self):
+        if not self.tag:
+            raise ValueError('all parents must have a tag')
+        if not self.children:
+            raise ValueError('must have children')
+        children_html = ''
+        for child in self.children:
+            children_html += child.to_html()
+        return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"
+
+    def __repr__(self):
+        return f"ParentNode({self.tag}, children: {self.children}, {self.props})"
         
 
 
