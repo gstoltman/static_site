@@ -45,10 +45,19 @@ def extract_markdown_images(text):
     url_text = re.findall(r'\((https?://[^\s)]+)\)', text)
     return list(zip(alt_text, url_text))
 
+def split_nodes_image(old_nodes):
+    new_nodes = []
+    # do we have to use full regex extraction as delimiter?
+    for old_node in old_nodes:
+        image_list = 
+
 def extract_markdown_links(text):
     alt_text = re.findall(r'\[(.*?)\]', text)
     url_text = re.findall(r'\((https?://[^\s)]+)\)', text)
     return list(zip(alt_text, url_text))
+
+def splitnode_link(old_nodes):
+    pass
 
 if __name__ == "__main__":
     main()
