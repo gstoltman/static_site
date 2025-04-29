@@ -1,54 +1,31 @@
 import re
-from textnode import TextNode, TextType, split_nodes_delimiter
+import os
+import shutil
+from textnode import *
 from htmlnode import HTMLNode, LeafNode, ParentNode
+from blocks import *
 
 def main():
-    #new_textnode = TextNode('test text', TextType.IMAGE, 'https://www.google.com')
-#
-    #new_htmlnode = HTMLNode(tag='p', value='Hello, world!', props={"href": "https://www.google.com","target": "_blank",})
-    #props_test = new_htmlnode.props_to_html()
-#
-    #new_leaf_node = LeafNode("a", "Click me!", {"href": "https://www.google.com"}).to_html()
-#
-    #text_node_to_html_node_text = text_node_to_html_node(new_textnode).to_html()
-    #print(text_node_to_html_node_text)
-    #node = TextNode("This is text with a `code block` word", TextType.TEXT)
-    #new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
-#
-    #print(new_nodes)
-    text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+    static_to_public('./static')
 
-    print(extract_markdown_links(text))
+def static_to_public(static_path, public_path='./public'):
+    if os.path.exists(public_path):
+        shutil.rmtree(public_path)
+    os.mkdir(public_path)
 
+    def copy_dir(src_path, dest_path):
+        os.makedirs(dest_path, exist_ok=True)
+        for item in os.listdir(src_path):
+            src_item = os.path.join(src_path, item)
+            dest_item = os.path.join(dest_path, item)
 
-def text_node_to_html_node(text_node):
-    if not text_node.text_type:
-        return LeafNode()
-    match(text_node.text_type):
-        case TextType.TEXT:
-            return LeafNode(tag=None, value=text_node.text)
-        case TextType.BOLD:
-            return LeafNode("b", value=text_node.text)
-        case TextType.ITALIC:
-            return LeafNode("i", value=text_node.text)
-        case TextType.CODE:
-            return LeafNode("code", value=text_node.text)
-        case TextType.LINK:
-            return LeafNode("a", value=text_node.text, props={"href": text_node.url})
-        case TextType.IMAGE:
-            return LeafNode("img", value=' ', props={"src": text_node.url, "alt": text_node.text}) 
-        case _:
-            raise Exception('wrong text type')
-
-def extract_markdown_images(text):
-    alt_text = re.findall(r'!\[(.*?)\]', text)
-    url_text = re.findall(r'\((https?://[^\s)]+)\)', text)
-    return list(zip(alt_text, url_text))
-
-def extract_markdown_links(text):
-    alt_text = re.findall(r'\[(.*?)\]', text)
-    url_text = re.findall(r'\((https?://[^\s)]+)\)', text)
-    return list(zip(alt_text, url_text))
+            if os.path.isfile(src_item):
+                shutil.copy2(src_item, dest_item)
+            elif os.path.isdir(src_item):
+                copy_dir(src_item, dest_item)
+    
+    copy_dir(static_path, public_path)
+        
 
 if __name__ == "__main__":
     main()
